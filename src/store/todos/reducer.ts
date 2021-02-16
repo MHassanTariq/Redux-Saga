@@ -5,9 +5,13 @@ import {FETCH_TODOS_SUCCESS} from './fetch/types';
 import {TodoActions} from './types';
 import {UPDATE_TODO_SUCCESS} from './update/types';
 
+// This is to store the todo state of our application.
+
 export type TodoState = {
   todos: Todo[];
 };
+
+// initializing the state
 
 const initialState: TodoState = {
   todos: [],
@@ -19,21 +23,40 @@ const todosReducer = (
 ): TodoState => {
   switch (action.type) {
     case FETCH_TODOS_SUCCESS:
-      return {todos: action.todos};
+      return {
+        todos: action.todos,
+      };
+
     case ADD_TODOS_SUCCESS:
-      return {todos: state.todos.concat(action.todo)};
+      return {
+        todos: [action.todo, ...state.todos],
+      };
+
     case UPDATE_TODO_SUCCESS:
-      const updated = [...state.todos];
-      updated.splice(
-        updated.findIndex((todo) => todo.id === action.todo.id),
-        1,
-        action.todo,
-      );
-      return {todos: updated};
+      const updatedTodos = updateTodoList(state.todos, action.todo);
+      return {
+        todos: updatedTodos,
+      };
+
     case DELETE_TODO_SUCCESS:
-      return {todos: state.todos.filter((todo) => todo.id !== action.todo.id)};
+      const todosResult = state.todos.filter(
+        (todo) => todo.id !== action.todo.id,
+      );
+      return {
+        todos: todosResult,
+      };
     default:
       return state;
   }
 };
 export default todosReducer;
+
+function updateTodoList(todos: Todo[], updatedTodo: Todo) {
+  const indexToUpdate = todos.findIndex((todo) => todo.id === updatedTodo.id);
+  if (indexToUpdate < 0) {
+    return todos;
+  }
+  const updatedTodos = [...todos];
+  updatedTodos.splice(indexToUpdate, 1, updatedTodo);
+  return updatedTodos;
+}

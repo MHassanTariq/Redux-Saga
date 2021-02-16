@@ -6,6 +6,10 @@ import {
 import {updateTodoOnServer} from './helper';
 import {UpdateTodoRequestAction, UPDATE_TODO_REQUEST} from './types';
 
+/**
+ * This is handling the API call and managing the success and failure cases.
+ * It also dispatches the action depending upon the API result.
+ */
 function* handleUpdateTodo(action: UpdateTodoRequestAction) {
   try {
     const isUpdatedOnServer: boolean = yield call(
@@ -18,6 +22,7 @@ function* handleUpdateTodo(action: UpdateTodoRequestAction) {
   }
 }
 
+// This saga watches UPDATE_TODOS_REQUEST.
 export function* updateTodoSaga() {
   yield takeEvery(UPDATE_TODO_REQUEST, handleUpdateTodo);
 }

@@ -4,6 +4,10 @@ import {getFetchTodoFailureAction, getFetchTodoSuccessAction} from './actions';
 import {fetchTodosFromApi} from './helper';
 import {FETCH_TODOS_REQUEST} from './types';
 
+/**
+ * This is handling the API call and managing the success and failure cases.
+ * It also dispatches the action depending upon the API result.
+ */
 function* handleFetchTodos() {
   try {
     const data = yield call(fetchTodosFromApi);
