@@ -7,7 +7,6 @@ import {Todo} from '../../../model';
 function* handleAddTodo(action: AddTodoRequestAction) {
   try {
     const data: Todo = yield call(addTodoOnServer, action.todoTitle);
-    console.log(data);
     yield put(getAddTodoSuccessAction(data));
   } catch (error) {
     put(getAddTodoFailureAction(error));

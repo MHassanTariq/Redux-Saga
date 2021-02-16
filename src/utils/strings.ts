@@ -1,8 +1,12 @@
 export const REMOVE = 'Remove';
 export const ADD_TODO = 'Add Todo';
 export const ADD = 'Add';
-export const MOBX_TUTORIAL = 'Redux-Saga Tutorial';
+export const TUTORIAL_NAME = 'Redux-Saga Tutorial';
 export const ALERT_TITLE = 'Enter Todo';
 export const TOTAL = 'Total';
 export const DONE = 'Done';
 export const TODO = 'To-Do';
+export const ERROR = 'Error';
+export const RE_TRY = 'Retry';
+export const CANCEL = 'Cancel';
+export const NETWORK_CONNECTIVITY_ERROR = 'Network connectivity error';

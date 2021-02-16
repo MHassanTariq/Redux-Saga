@@ -1,15 +1,23 @@
-import React, {Component, Dispatch} from 'react';
-import {SafeAreaView, ScrollView, Text} from 'react-native';
+import React, {Dispatch, useCallback, useEffect} from 'react';
+import {FlatList, Text, View} from 'react-native';
 import SingleTodoRow from '../singleTodoRow';
 import styles from './styles';
 import TodoInput from '../todoInput/todoInput';
-import {ADD_TODO, MOBX_TUTORIAL} from '../../utils/strings';
-import appStyles from '../../utils/appStyles';
+import {
+  ADD_TODO,
+  CANCEL,
+  ERROR,
+  RE_TRY,
+  TUTORIAL_NAME,
+} from '../../utils/strings';
 import InfoBar from '../infoBar';
 import {Todo} from '../../model';
 import {getFewTodosNumber} from './helper';
 import {StoreState} from '../../store/root/rootReducer';
-import {FetchTodosRequestAction} from '../../store/todos/fetch/types';
+import {
+  FetchTodosRequestAction,
+  FETCH_TODOS,
+} from '../../store/todos/fetch/types';
 import {AddTodoRequestAction} from '../../store/todos/add/types';
 import {getFetchTodoRequestAction} from '../../store/todos/fetch/actions';
 import {getAddTodoRequestAction} from '../../store/todos/add/actions';
@@ -18,78 +26,91 @@ import {getUpdateTodoRequestAction} from '../../store/todos/update/actions';
 import {UpdateTodoRequestAction} from '../../store/todos/update/types';
 import {DeleteTodoRequestAction} from '../../store/todos/delete/types';
 import {getDeleteTodoRequestAction} from '../../store/todos/delete/actions';
+import ActivityIndicatorView from '../activityIndicator';
+import {showAlertWithTwoButtons} from '../../utils/helper';
 
 interface Props {
+  isLoading: boolean;
+  error: string | null;
+  todos: Todo[];
   addTodo: (title: string) => void;
   fetchTodos: () => void;
   updateTodo: (todo: Todo) => void;
   removeTodo: (todo: Todo) => void;
-  todos: Todo[];
 }
 
-class TodoList extends Component<Props> {
-  constructor(props: Props) {
-    super(props);
+const TodoList: React.FC<Props> = ({
+  isLoading,
+  error,
+  todos,
+  addTodo,
+  fetchTodos,
+  updateTodo,
+  removeTodo,
+}) => {
+  useEffect(() => {
+    fetchTodos();
+  }, [fetchTodos]);
 
-    this.onRemove = this.onRemove.bind(this);
-    this.onToggle = this.onToggle.bind(this);
-    this.onAddTodo = this.onAddTodo.bind(this);
-    this.renderTodos = this.renderTodos.bind(this);
+  const fetchData = useCallback(() => {
+    fetchTodos();
+  }, [fetchTodos]);
+
+  useEffect(() => {
+    if (error) {
+      showAlertWithTwoButtons(ERROR, RE_TRY, fetchData, CANCEL, error);
+    }
+  }, [error, fetchData]);
+
+  function onRemove(todo: Todo) {
+    removeTodo(todo);
   }
 
-  componentDidMount() {
-    this.props.fetchTodos();
-  }
-
-  onRemove(todo: Todo) {
-    this.props.removeTodo(todo);
-  }
-
-  onToggle(todo: Todo) {
+  function onToggle(todo: Todo) {
     todo.completed = !todo.completed;
-    this.props.updateTodo(todo);
+    updateTodo(todo);
   }
 
-  onAddTodo(todo: string) {
-    this.props.addTodo(todo);
+  function onAddTodo(todo: string) {
+    addTodo(todo);
   }
 
-  renderTodos() {
-    const todosRendering: JSX.Element[] = [];
-    this.props.todos.forEach((todo) => {
-      todosRendering.push(
-        <SingleTodoRow
-          key={todo.id}
-          todo={todo}
-          onRemove={this.onRemove}
-          onToggle={this.onToggle}
-        />,
-      );
-    });
+  function renderTodoItem({item}: {item: Todo}) {
     return (
-      <ScrollView style={appStyles.container}>{todosRendering}</ScrollView>
+      <SingleTodoRow todo={item} onRemove={onRemove} onToggle={onToggle} />
     );
   }
 
-  render() {
+  function renderTodos() {
     return (
-      <SafeAreaView style={styles.container}>
-        <TodoInput placeholder={ADD_TODO} onClickAdd={this.onAddTodo} />
-        <InfoBar
-          total={this.props.todos.length}
-          completed={getFewTodosNumber(this.props.todos, true)}
-          remaining={getFewTodosNumber(this.props.todos, false)}
-        />
-        {this.renderTodos()}
-        <Text style={styles.mobxTutorial}>{MOBX_TUTORIAL}</Text>
-      </SafeAreaView>
+      <FlatList
+        data={todos}
+        renderItem={renderTodoItem}
+        keyExtractor={(_, index) => index.toString()}
+      />
     );
   }
-}
+
+  return (
+    <View style={styles.container}>
+      <ActivityIndicatorView show={isLoading} />
+      <TodoInput placeholder={ADD_TODO} onClickAdd={onAddTodo} />
+      <InfoBar
+        total={todos.length}
+        completed={getFewTodosNumber(todos, true)}
+        remaining={getFewTodosNumber(todos, false)}
+      />
+      {renderTodos()}
+      <Text style={styles.tutorialText}>{TUTORIAL_NAME}</Text>
+    </View>
+  );
+};
 
 const mapStateToProps = (store: StoreState) => {
   return {
     todos: store.todos.todos,
+    isLoading: store.loadingState[FETCH_TODOS],
+    error: store.errorState[FETCH_TODOS],
   };
 };
 

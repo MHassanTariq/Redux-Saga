@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import appStyles from '../../utils/appStyles';
 import {DARK_GREEN} from '../../utils/colors';
 import {INFO_SIZE} from '../../utils/fonts';
 
@@ -11,8 +12,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   infoContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    ...appStyles.centeredChildren,
   },
   headingText: {
     fontSize: INFO_SIZE,

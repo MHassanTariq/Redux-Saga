@@ -1,4 +1,5 @@
 import {call, put, takeLatest} from 'redux-saga/effects';
+import {NETWORK_CONNECTIVITY_ERROR} from '../../../utils/strings';
 import {getFetchTodoFailureAction, getFetchTodoSuccessAction} from './actions';
 import {fetchTodosFromApi} from './helper';
 import {FETCH_TODOS_REQUEST} from './types';
@@ -8,7 +9,10 @@ function* handleFetchTodos() {
     const data = yield call(fetchTodosFromApi);
     yield put(getFetchTodoSuccessAction(data));
   } catch (error) {
-    put(getFetchTodoFailureAction(error));
+    const errorMessage = error.response
+      ? error.response.data.message
+      : NETWORK_CONNECTIVITY_ERROR;
+    yield put(getFetchTodoFailureAction(errorMessage));
   }
 }
 

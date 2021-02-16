@@ -1,10 +1,14 @@
 import {StyleSheet} from 'react-native';
+import appStyles from '../../utils/appStyles';
 import {BLACK} from '../../utils/colors';
 import {TUTORIAL_TEXT_SIZE} from '../../utils/fonts';
 
 const styles = StyleSheet.create({
-  container: {marginHorizontal: 10, flex: 1},
-  mobxTutorial: {
+  container: {
+    ...appStyles.container,
+    marginHorizontal: 10,
+  },
+  tutorialText: {
     alignSelf: 'center',
     fontSize: TUTORIAL_TEXT_SIZE,
     fontWeight: 'bold',
